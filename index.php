@@ -1,4 +1,6 @@
-<?php 
+<?php
+session_start();
+require_once "vendor/facebook/graph-sdk/src/Facebook/autoload.php";
 require_once "includes/connection.php";
 require_once "includes/settings.php";
  
@@ -120,7 +122,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
             // Attempt to execute the prepared statement
             if($stmt->execute()){
                 // Redirect to login page
-                header("location: login.php");
+                header("location: https://morphnetworth.000webhostapp.com/login.php");
             } else{
                 echo "Something went wrong. Please try again later.";
             }
@@ -187,8 +189,26 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
                             </div>
                             <div class="form-group">
                                 <button type="submit" name="submit" class="submit-btn">Sign Up</button>
+                                 <?php 
+                            
+                            $fb = new Facebook\Facebook([
+                                'app_id' => '391266395158248', // Replace {app-id} with your app id
+                                'app_secret' => 'a0d9d8e4d59da425540c9cecd067d762',
+                                'default_graph_version' => 'v3.2',
+                                ]);
+                              
+                              $helper = $fb->getRedirectLoginHelper();
+                              
+                              $permissions = 'Facebook User'; // Optional permissions
+                              $_SESSION['email'] = $permissions;
+                              
+                              $loginUrl = $helper->getLoginUrl('https://morphnetworth.000webhostapp.com/fb-callback.php');
+                              
+                              echo '<a href="' . htmlspecialchars($loginUrl) . '">    or Log in with Facebook!</a>';
+                            ?>
                             </div>
                             <h6 class=""> Already have an account? <a href="login.php"> Log In </a> </h6>
+                             
                         </form>
                     </div>
                 </form>
