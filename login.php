@@ -1,4 +1,6 @@
 <?php
+session_start();
+require_once "vendor/facebook/graph-sdk/src/Facebook/autoload.php";
 require_once "connection.php";
 
 /*declaring variables*/
@@ -45,17 +47,21 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
                     // Bind result variables
                     $stmt->bind_result($UserID, $email, $hashed_password);
                     if($stmt->fetch()){
-                        if(password_verify($password, $hashed_password) or password_verify($password)){
+                        if(password_verify($password, $hashed_password)){
                             // Password is correct, so start a new session
-                            session_start();
+                            
                             
                             // Store data in session variables
                             $_SESSION["loggedin"] = true;
                             $_SESSION["UserID"] = $UserID;
-                            $_SESSION["email"] = $email;                            
-                            
+                            $_SESSION["email"] = $email;
+                            ?>
+                            <script>
+                            window.location="main.php";
+                            </script>
+                            <?php
                             // Redirect user to welcome page
-                            header("location: main.php");
+                            // header("location: main.php");
                        // echo ("Welcome to MorphWorth!");
                    
                     }else{
@@ -121,15 +127,32 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
 
                         <div class="form-group">
                             <button type="submit" class="submit-btn" value="Login">Log In</button>
+                               <?php 
+                            
+                            $fb = new Facebook\Facebook([
+                                'app_id' => '391266395158248', // Replace {app-id} with your app id
+                                'app_secret' => 'a0d9d8e4d59da425540c9cecd067d762',
+                                'default_graph_version' => 'v3.2',
+                                ]);
+                              
+                              $helper = $fb->getRedirectLoginHelper();
+                              
+                              $permissions = 'Facebook User'; // Optional permissions
+                              $_SESSION['email'] = $permissions;
+                              
+                              $loginUrl = $helper->getLoginUrl('https://morphnetworth.000webhostapp.com/fb-callback.php');
+                              echo '<br><br>';
+                              echo '<a href="' . htmlspecialchars($loginUrl) . '">    or Log in with Facebook!</a>';
+                            ?>
                         </div>
-                         <h6 class="mt-2 "> <a href="password_reset.php">  Forgot Password? </a> </h6>
-                        <h6 class="mt-3"> Not registered yet? <a href="index.php"> <b> Sign Up </b> </a> </h6>
+                        <h6 class=""> Not registered yet? <a href="index.php"> Sign Up </a> </h6>
                     </form>
                 </div>
             </form>
         </div>
 
     </div>
+
 </body>
 
 </html>
